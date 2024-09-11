@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 14:57:38 by fbbot             #+#    #+#             */
-/*   Updated: 2024/09/10 20:55:47 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/09/11 14:34:38 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,12 +47,12 @@ int	print_error(char *err)
 
 int	main(int argc, char **argv)
 {
-	t_setup	setup;
+	t_philo	philos;
 
 	if (argc != 5 && argc != 6)
 		return (print_usage());
 	if (!check_args(argv))
 		return (print_usage());
-	start_simulation(&setup, argv);
+	start_simulation(&philos, argv);
 	return (0);
 }
