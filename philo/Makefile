@@ -13,7 +13,7 @@
 CC	= gcc
 CFLAGS	= -Wall -Wextra -Werror 
 NAME	= philo
-SRCS	= main.c simulation.c init.c philo_utils.c actions.c monitor.c
+SRCS	= main.c init.c philo_utils.c actions.c
 OBJS	= $(SRCS:%.c=%.o)
 
 .PHONY : all re clean fclean

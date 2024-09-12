@@ -48,11 +48,12 @@ int	print_error(char *err)
 int	main(int argc, char **argv)
 {
 	t_philo	philos;
-
+	
 	if (argc != 5 && argc != 6)
 		return (print_usage());
 	if (!check_args(argv))
 		return (print_usage());
-	start_simulation(&philos, argv);
+	init_philos(&philos, argv);
+	end_philos(&philos);
 	return (0);
 }

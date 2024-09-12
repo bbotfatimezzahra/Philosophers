@@ -12,6 +12,23 @@
 
 #include "philo.h"
 
+t_setup	*init_setup(char **argv)
+{
+	t_setup	*setup;
+
+	setup = malloc(sizeof(t_setup));
+	if (!setup)
+		exit(print_error(ERR_MALLOC));
+	setup->num_philos = ft_atoi(argv[1]);
+	setup->time_die = ft_atoi(argv[2]);
+	setup->time_eat = ft_atoi(argv[3]);
+	setup->time_sleep = ft_atoi(argv[4]);
+	if (argv[5])
+		setup->num_eat_times = ft_atoi(argv[5]);
+	setup->start = get_timestamp();
+	return (setup);
+}
+
 t_fork	*init_forks(t_setup setup)
 {
 	t_fork	*forks;
@@ -25,39 +42,52 @@ t_fork	*init_forks(t_setup setup)
 	tmp = forks;
 	while (i < setup.num_philos)
 	{
-		tmp[i]->id = i;
-		pthread_mutex_init(&(tmp[i]->fork), NULL);
+		tmp[i].id = i;
+		pthread_mutex_init(&(tmp[i].fork), NULL);
 		i++;
 	}
 	return (forks);
 }
 
-t_setup	*init_setup(char **argv)
-{
-}
-
-t_philo	*init_philos(char **argv)
+void	init_philos(t_philo *philos, char **argv)
 {
 	t_philo	*tmp;
+	t_setup	*setup;
+	t_fork	*forks;
 	int	i;
 
-	setup->philos = malloc(sizeof(t_philo) * setup->num_philos);
-	if (!(setup->philos))
+	setup = init_setup(argv);
+	forks = init_forks(*setup);
+	philos = malloc(sizeof(t_philo) * setup->num_philos);
+	if (!philos)
 		exit(print_error(ERR_MALLOC));
-	tmp = setup->philos;
+	tmp = philos;
 	i = 0;
 	while (i < setup->num_philos)
 	{
 		tmp[i].id = i + 1;
-		tmp[i].times = setup->times;
-		tmp[i].forks = setup->forks;
+		tmp[i].setup = setup;
+		tmp[i].forks = forks;
 		pthread_create(&(tmp[i].thread), NULL, living, &tmp[i]);
 		i++;
 	}
 	i = 0;
+	tmp = philos;
 	while (i < setup->num_philos)
+		pthread_join(tmp[i++].thread, NULL);
+}
+
+void	end_philos(t_philo *philos)
+{
+	int	i;
+
+	i = 0;
+	while (i < philos->setup->num_philos)
 	{
-		pthread_join(tmp[i].thread, NULL);
+		pthread_mutex_destroy(&(philos->forks[i].fork));
 		i++;
 	}
+	free(philos->forks);
+	free(philos->setup);
+	free(philos);
 }

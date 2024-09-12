@@ -14,22 +14,22 @@
 
 void	eating(t_philo philo)
 {
-	if (philo.forks[philo.id] && philo.forks[philo.id % 
-	printf("%ld ms %d has taken a fork\n", get_timestamp() - philo.times.start, philo.id);
-	printf("%ld ms %d is eating\n", get_timestamp() - philo.times.start, philo.id);
-	usleep(philo.times.time_eat);
+	//if (philo.forks[philo.id] && philo.forks[philo.id % 
+	printf("%ld ms %d has taken a fork\n", get_timestamp() - philo.setup->start, philo.id);
+	printf("%ld ms %d is eating\n", get_timestamp() - philo.setup->start, philo.id);
+	usleep(philo.setup->time_eat);
 }
 
 void	sleeping(t_philo philo)
 {
-	printf("%ld ms %d is sleeping\n", get_timestamp() - philo.times.start, philo.id);
-	usleep(philo.times.time_sleep);
+	printf("%ld ms %d is sleeping\n", get_timestamp() - philo.setup->start, philo.id);
+	usleep(philo.setup->time_sleep);
 }
 
 void	thinking(t_philo philo)
 {
-	printf("%ld ms %d is thinking\n", get_timestamp() - philo.times.start, philo.id);
-	usleep(philo.times.time_die);
+	printf("%ld ms %d is thinking\n", get_timestamp() - philo.setup->start, philo.id);
+	usleep(philo.setup->time_die);
 }
 
 void	*living(void *philo)
@@ -40,6 +40,6 @@ void	*living(void *philo)
 	eating(*ph);
 	sleeping(*ph);
 	thinking(*ph);
-	printf("%ld ms %d died\n", get_timestamp() - ph->times.start, ph->id);
+	printf("%ld ms %d died\n", get_timestamp() - ph->setup->start, ph->id);
 	return (NULL);
 }
