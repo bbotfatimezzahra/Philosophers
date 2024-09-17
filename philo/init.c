@@ -49,15 +49,19 @@ t_fork	*init_forks(t_setup setup)
 	return (forks);
 }
 
-void	init_philos(t_philo *philos, char **argv)
+t_philo	*init_philos(t_philo *philos, char **argv)
 {
 	t_philo	*tmp;
 	t_setup	*setup;
 	t_fork	*forks;
+	pthread_mutex_t	read;
+	pthread_mutex_t	write;
 	int	i;
 
 	setup = init_setup(argv);
 	forks = init_forks(*setup);
+	pthread_mutex_init(&read, NULL);
+	pthread_mutex_init(&write, NULL);
 	philos = malloc(sizeof(t_philo) * setup->num_philos);
 	if (!philos)
 		exit(print_error(ERR_MALLOC));
@@ -68,6 +72,8 @@ void	init_philos(t_philo *philos, char **argv)
 		tmp[i].id = i + 1;
 		tmp[i].setup = setup;
 		tmp[i].forks = forks;
+		tmp[i].read = read;
+		tmp[i].write = write;
 		pthread_create(&(tmp[i].thread), NULL, living, &tmp[i]);
 		i++;
 	}
@@ -75,6 +81,7 @@ void	init_philos(t_philo *philos, char **argv)
 	tmp = philos;
 	while (i < setup->num_philos)
 		pthread_join(tmp[i++].thread, NULL);
+	return (philos);
 }
 
 void	end_philos(t_philo *philos)

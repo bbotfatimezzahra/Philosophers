@@ -45,12 +45,14 @@ typedef struct s_philo
 	pthread_t	thread;
 	t_setup	*setup;
 	t_fork	*forks;
+	pthread_mutex_t	read;
+	pthread_mutex_t	write;
 }		t_philo;
 
 int	ft_atoi(const char *str);
 int	ft_isdigit(int c);
 void	start_simulation(t_philo *philos, char **argv);
-void	init_philos(t_philo *philos, char **argv);
+t_philo	*init_philos(t_philo *philos, char **argv);
 void	end_philos(t_philo *philos);
 uint64_t	get_timestamp(void);
 void	*living(void *philo);
