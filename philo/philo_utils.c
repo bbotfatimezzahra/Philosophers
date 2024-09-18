@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 16:02:37 by fbbot             #+#    #+#             */
-/*   Updated: 2024/09/11 11:40:52 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/09/18 17:51:22 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,3 +45,11 @@ uint64_t	get_timestamp(void)
 	return ((time.tv_sec * (uint64_t)1000) + (time.tv_usec / 1000));
 }
 
+void	ft_usleep(int	time)
+{
+	uint64_t	s;
+
+	s = get_timestamp();
+	while ((get_timestamp() - s) < (uint64_t)time)
+		usleep(500);
+}

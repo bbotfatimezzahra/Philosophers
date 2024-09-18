@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 20:50:51 by fbbot             #+#    #+#             */
-/*   Updated: 2024/09/11 14:34:35 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/09/18 22:48:58 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,21 +29,21 @@ t_setup	*init_setup(char **argv)
 	return (setup);
 }
 
-t_fork	*init_forks(t_setup setup)
+pthread_mutex_t	*init_forks(t_setup setup)
 {
-	t_fork	*forks;
-	t_fork	*tmp;
+	pthread_mutex_t	*forks;
+	pthread_mutex_t	*tmp;
 	int	i;
 
-	forks = malloc(sizeof(t_fork) * setup.num_philos);
+	forks = malloc(sizeof(pthread_mutex_t) * setup.num_philos);
 	if (!forks)
 		exit(print_error(ERR_MALLOC));
 	i = 0;
 	tmp = forks;
 	while (i < setup.num_philos)
 	{
-		tmp[i].id = i;
-		pthread_mutex_init(&(tmp[i].fork), NULL);
+		memset(&tmp[i], 0, sizeof(pthread_mutex_t));
+		pthread_mutex_init(&tmp[i], NULL);
 		i++;
 	}
 	return (forks);
@@ -53,15 +53,17 @@ t_philo	*init_philos(t_philo *philos, char **argv)
 {
 	t_philo	*tmp;
 	t_setup	*setup;
-	t_fork	*forks;
-	pthread_mutex_t	read;
-	pthread_mutex_t	write;
+	pthread_mutex_t	*forks;
+	pthread_mutex_t	*write;
+	pthread_mutex_t	*meal;
 	int	i;
 
 	setup = init_setup(argv);
 	forks = init_forks(*setup);
-	pthread_mutex_init(&read, NULL);
-	pthread_mutex_init(&write, NULL);
+	write = malloc(sizeof(pthread_mutex_t));
+	meal = malloc(sizeof(pthread_mutex_t));
+	pthread_mutex_init(write, NULL);
+	pthread_mutex_init(meal, NULL);
 	philos = malloc(sizeof(t_philo) * setup->num_philos);
 	if (!philos)
 		exit(print_error(ERR_MALLOC));
@@ -72,15 +74,23 @@ t_philo	*init_philos(t_philo *philos, char **argv)
 		tmp[i].id = i + 1;
 		tmp[i].setup = setup;
 		tmp[i].forks = forks;
-		tmp[i].read = read;
-		tmp[i].write = write;
-		pthread_create(&(tmp[i].thread), NULL, living, &tmp[i]);
+		tmp[i].wrilock = write;
+		tmp[i].mealock = meal;
+		tmp[i].meals = 0;
+		tmp[i].last_meal = tmp[i].setup->start;
+		memset(&(tmp[i].thread), 0, sizeof(pthread_t));
+		if (pthread_create(&(tmp[i].thread), NULL, living, &tmp[i]) < 0)
+			exit(print_error("pthread_create error\n"));
 		i++;
 	}
-	i = 0;
 	tmp = philos;
-	while (i < setup->num_philos)
-		pthread_join(tmp[i++].thread, NULL);
+	i = 0;
+	while (i < ft_atoi(argv[1]))
+	{
+		if (pthread_join(tmp[i].thread, NULL) < 0)
+			exit(print_error("pthread_join\n"));
+		i++;
+	}
 	return (philos);
 }
 
@@ -91,10 +101,14 @@ void	end_philos(t_philo *philos)
 	i = 0;
 	while (i < philos->setup->num_philos)
 	{
-		pthread_mutex_destroy(&(philos->forks[i].fork));
+		pthread_mutex_destroy(&(philos->forks[i]));
 		i++;
 	}
 	free(philos->forks);
+	pthread_mutex_destroy(philos->wrilock);
+	pthread_mutex_destroy(philos->mealock);
+	free(philos->wrilock);
+	free(philos->mealock);
 	free(philos->setup);
 	free(philos);
 }
