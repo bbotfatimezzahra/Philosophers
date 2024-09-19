@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 15:01:39 by fbbot             #+#    #+#             */
-/*   Updated: 2024/09/18 22:46:51 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/09/19 22:11:46 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,34 +26,42 @@
 
 typedef struct s_setup
 {
-	int	num_philos;
-	int	time_die;
-	int	time_eat;
-	int	time_sleep;
-	int	num_eat_times;
-	uint64_t	start;
+	int				num_philos;
+	int				time_die;
+	int				time_eat;
+	int				time_sleep;
+	int				num_meals;
+	uint64_t		start;
+	int				death;
+	pthread_mutex_t	*deadlock;
 }		t_setup;
 
 typedef struct s_philo
 {
-	int	id;
-	pthread_t	thread;
-	t_setup	*setup;
+	int				id;
+	pthread_t		thread;
+	t_setup			*setup;
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	*wrilock;
 	pthread_mutex_t	*mealock;
-	int	meals;
-	uint64_t	last_meal;
+	int				meals;
+	uint64_t		last_meal;
 }		t_philo;
 
-int	ft_atoi(const char *str);
-int	ft_isdigit(int c);
-void	start_simulation(t_philo *philos, char **argv);
-t_philo	*init_philos(t_philo *philos, char **argv);
-void	end_philos(t_philo *philos);
-uint64_t	get_timestamp(void);
-void	*living(void *philo);
-int	print_error(char *err);
-void	ft_usleep(int	time);
+int				ft_atoi(const char *str);
+int				ft_isdigit(int c);
+void			start_simulation(t_philo *philos, char **argv);
+void			end_philos(t_philo *philos);
+uint64_t		get_timestamp(void);
+void			*living(void *philo);
+int				print_error(char *err);
+void			ft_usleep(int time);
+void			ft_printf(char *msg, t_philo philo);
+int				check_death(t_philo philo);
+t_setup			*init_setup(char **argv);
+t_philo			*init_philos(t_philo *p, t_setup *s, pthread_mutex_t *f);
+pthread_mutex_t	*init_forks(t_setup setup);
+int				check_args(char **arg);
+int				check_meals(t_philo philo);
 
 #endif

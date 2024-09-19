@@ -6,35 +6,31 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 16:02:37 by fbbot             #+#    #+#             */
-/*   Updated: 2024/09/18 17:51:22 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/09/19 21:35:50 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int	ft_isdigit(int c)
+int	check_death(t_philo philo)
 {
-	if (c < '0' || c > '9')
+	pthread_mutex_lock(philo.setup->deadlock);
+	if (philo.setup->death)
+	{
+		pthread_mutex_unlock(philo.setup->deadlock);
 		return (0);
+	}
+	pthread_mutex_unlock(philo.setup->deadlock);
 	return (1);
 }
 
-int	ft_atoi(const char *str)
+void	ft_printf(char *msg, t_philo philo)
 {
-	long long	result;
-	int			i;
-
-	result = 0;
-	i = 0;
-	while (str[i] && ((str[i] >= 9 && str[i] <= 13) || str[i] == 32))
-		i++;
-	while (str[i] && (str[i] >= '0' && str[i] <= '9'))
-	{
-		result = (result * 10) + (str[i++] - '0');
-		if (result > INT_MAX || result == 0)
-			return (-1);
-	}
-	return (result);
+	if (!check_death(philo))
+		return ;
+	pthread_mutex_lock(philo.wrilock);
+	printf(msg, get_timestamp() - philo.setup->start, philo.id);
+	pthread_mutex_unlock(philo.wrilock);
 }
 
 uint64_t	get_timestamp(void)
@@ -45,7 +41,7 @@ uint64_t	get_timestamp(void)
 	return ((time.tv_sec * (uint64_t)1000) + (time.tv_usec / 1000));
 }
 
-void	ft_usleep(int	time)
+void	ft_usleep(int time)
 {
 	uint64_t	s;
 
