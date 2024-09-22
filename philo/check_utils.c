@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 19:01:17 by fbbot             #+#    #+#             */
-/*   Updated: 2024/09/19 22:49:13 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/09/22 16:14:06 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,18 +60,27 @@ int	check_args(char **arg)
 	return (1);
 }
 
-int	check_meals(t_philo philo)
+int	check_meals(t_philo philo, int j)
 {
-	int	i;
+	int	meals;
 
 	if (philo.setup->num_meals == -1)
 		return (1);
-	pthread_mutex_lock(philo.mealock);
-	if (philo.meals < philo.setup->num_meals)
-		i = 1;
-	else
-		i = 0;
-	pthread_mutex_unlock(philo.mealock);
-	return (i);
+	if (j == -1)
+	{
+		pthread_mutex_lock(philo.mealock);
+		meals = philo.setup->meals;
+		pthread_mutex_unlock(philo.mealock);
+		if (meals == philo.setup->num_philos)
+			return (0);
+		else
+			return (1);
+	}
+	else if (j == philo.setup->num_meals)
+	{
+		pthread_mutex_lock(philo.mealock);
+		philo.setup->meals++;
+		pthread_mutex_unlock(philo.mealock);
+	}
+	return (1);
 }
-

@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 20:50:51 by fbbot             #+#    #+#             */
-/*   Updated: 2024/09/19 22:49:14 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/09/21 19:30:09 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ t_setup	*init_setup(char **argv)
 	setup->deadlock = malloc(sizeof(pthread_mutex_t));
 	pthread_mutex_init(setup->deadlock, NULL);
 	setup->death = 0;
+	setup->meals = 0;
 	return (setup);
 }
 
@@ -71,19 +72,17 @@ t_philo	*init_philos(t_philo *philos, t_setup *setup, pthread_mutex_t *forks)
 	philos = malloc(sizeof(t_philo) * setup->num_philos);
 	if (!philos)
 		exit(print_error(ERR_MALLOC));
-	i = 0;
-	while (i < setup->num_philos)
+	i = -1;
+	while (++i < setup->num_philos)
 	{
 		philos[i].id = i + 1;
 		philos[i].setup = setup;
 		philos[i].forks = forks;
 		philos[i].wrilock = write;
-		philos[i].meals = 0;
 		philos[i].last_meal = philos[i].setup->start;
 		philos[i].mealock = mealock;
 		memset(&philos[i].thread, 0, sizeof(pthread_t));
 		pthread_create(&philos[i].thread, NULL, living, &philos[i]);
-		i++;
 	}
 	return (philos);
 }
