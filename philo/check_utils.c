@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 19:01:17 by fbbot             #+#    #+#             */
-/*   Updated: 2024/09/22 16:14:06 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/09/22 22:46:36 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 
 int	ft_isdigit(int c)
 {
-	if (c < '0' || c > '9')
-		return (0);
-	return (1);
+	if ((c >= '0' && c <= '9') || (c >= 9 && c <= 13) || c == 32)
+		return (1);
+	return (0);
 }
 
 int	ft_atoi(const char *str)
@@ -68,9 +68,9 @@ int	check_meals(t_philo philo, int j)
 		return (1);
 	if (j == -1)
 	{
-		pthread_mutex_lock(philo.mealock);
+		pthread_mutex_lock(&philo.setup->mealock);
 		meals = philo.setup->meals;
-		pthread_mutex_unlock(philo.mealock);
+		pthread_mutex_unlock(&philo.setup->mealock);
 		if (meals == philo.setup->num_philos)
 			return (0);
 		else
@@ -78,9 +78,9 @@ int	check_meals(t_philo philo, int j)
 	}
 	else if (j == philo.setup->num_meals)
 	{
-		pthread_mutex_lock(philo.mealock);
+		pthread_mutex_lock(&philo.setup->mealock);
 		philo.setup->meals++;
-		pthread_mutex_unlock(philo.mealock);
+		pthread_mutex_unlock(&philo.setup->mealock);
 	}
 	return (1);
 }

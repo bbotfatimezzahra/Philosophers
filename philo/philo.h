@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 15:01:39 by fbbot             #+#    #+#             */
-/*   Updated: 2024/09/22 15:48:10 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/09/22 22:13:55 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,9 @@ typedef struct s_setup
 	uint64_t		start;
 	int				death;
 	int				meals;
-	pthread_mutex_t	*deadlock;
+	pthread_mutex_t	deadlock;
+	pthread_mutex_t	wrilock;
+	pthread_mutex_t	mealock;
 }		t_setup;
 
 typedef struct s_philo
@@ -43,8 +45,6 @@ typedef struct s_philo
 	pthread_t		thread;
 	t_setup			*setup;
 	pthread_mutex_t	*forks;
-	pthread_mutex_t	*wrilock;
-	pthread_mutex_t	*mealock;
 	uint64_t		last_meal;
 }		t_philo;
 

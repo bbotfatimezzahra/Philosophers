@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 14:57:38 by fbbot             #+#    #+#             */
-/*   Updated: 2024/09/22 17:02:59 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/09/22 22:48:00 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,10 @@
 
 int	print_usage(void)
 {
-	write(2, "Error\n", 6);
 	printf("Usage : ./philo num_of_philos time_to_die time_to_eat");
 	printf(" time_to_sleep *num_of_times_aphilo_must_eat\n");
 	printf("*optional\n");
-	printf("All numbers should be non null positive integers\n");
+	printf("[0 - 200] [>60] [>60] [>60] [>=0]\n");
 	return (1);
 }
 
@@ -42,9 +41,9 @@ void	monitor(t_philo *philos)
 		{
 			if (!check_meals(philos[i], -1) || !check_death(philos[i], 1))
 			{
-				pthread_mutex_lock(philos[i].setup->deadlock);
+				pthread_mutex_lock(&philos[i].setup->deadlock);
 				philos[i].setup->death = 1;
-				pthread_mutex_unlock(philos[i].setup->deadlock);
+				pthread_mutex_unlock(&philos[i].setup->deadlock);
 				if (!check_death(philos[i], 1))
 				{
 					printf("%ld ", get_timestamp() - philos[i].setup->start);
