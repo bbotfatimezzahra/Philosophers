@@ -6,13 +6,13 @@
 #    By: fbbot <marvin@42.fr>                       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/10 14:51:08 by fbbot             #+#    #+#              #
-#    Updated: 2024/09/22 22:25:55 by fbbot            ###   ########.fr        #
+#    Updated: 2024/09/24 11:11:02 by fbbot            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CC	= gcc
 CFLAGS	= -Wall -Wextra -Werror -lpthread #-g3 -fsanitize=thread 
-NAME	= philo
+NAME	= philo_bonus
 SRCS	= main.c init.c philo_utils.c actions.c check_utils.c
 OBJS	= $(SRCS:%.c=%.o)
 
