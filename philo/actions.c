@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 16:57:05 by fbbot             #+#    #+#             */
-/*   Updated: 2024/09/24 15:30:23 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/10/09 16:10:21 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void	grab_forks(t_philo philo, int fork1, int fork2)
 	ft_printf("%ld %d has taken a fork\n", philo);
 }
 
-void	eating(t_philo *ph)
+void	eating(t_philo *ph, int i)
 {
 	int		fork2;
 	t_philo	philo;
@@ -32,13 +32,14 @@ void	eating(t_philo *ph)
 		return ;
 	fork2 = (philo.id % philo.setup->num_philos) + 1;
 	if (philo.id % 2 == 0)
+	{
+		ft_usleep(1, philo);
 		grab_forks(philo, philo.id, fork2);
+	}
 	else
 	{
-		if (philo.setup->num_philos % 2 == 1 && philo.id == 1)
+		if (philo.setup->num_philos % 2 == 1 && philo.id == 1 && !i)
 			ft_usleep(philo.setup->time_eat, philo);
-		else
-			ft_usleep(1, philo);
 		grab_forks(philo, fork2, philo.id);
 	}
 	ft_printf("%ld %d is eating\n", philo);
@@ -73,7 +74,7 @@ void	*living(void *ph)
 	while (check_meals(*philo, i) && check_death(*philo, 0))
 	{
 		thinking(*philo);
-		eating(philo);
+		eating(philo, i);
 		sleeping(*philo);
 		i++;
 		usleep(100);
