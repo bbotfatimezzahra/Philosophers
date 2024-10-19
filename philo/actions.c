@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 16:57:05 by fbbot             #+#    #+#             */
-/*   Updated: 2024/10/09 16:10:21 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/10/19 12:14:12 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,7 @@ void	sleeping(t_philo philo)
 void	thinking(t_philo philo)
 {
 	ft_printf("%ld %d is thinking\n", philo);
+	ft_usleep(1, philo);
 }
 
 void	*living(void *ph)

@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 20:50:51 by fbbot             #+#    #+#             */
-/*   Updated: 2024/09/23 00:03:32 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/10/19 17:12:00 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,12 @@ t_setup	*init_setup(char **argv)
 	else
 		setup->num_meals = -1;
 	setup->start = get_timestamp();
+	setup->mealock = sem_open("meals", O_CREAT | O_EXCL, 0644, 1);
+	setup->deadlock = sem_open("death", O_CREAT | O_EXCL, 0644, 1);
+	setup->wrilock = sem_open("write", O_CREAT | O_EXCL, 0644, 1);
+	if (setup->mealock == SEM_FAILED || setup->deadlock == SEM_FAILED
+			|| setup->wrilock == SEM_FAILED)
+		return (print_error(ERR_SEM), NULL);
 	setup->death = 0;
 	setup->meals = 0;
 	return (setup);
@@ -46,7 +52,8 @@ sem_t	*init_forks(t_setup setup)
 {
 	sem_t	*forks;
 
-	forks = sem_open("sem", O_CREAT | O_EXCL, 0644, setup.num_philos);
+	sem_unlink("forks");
+	forks = sem_open("forks", O_CREAT | O_EXCL, 0644, setup.num_philos);
 	if (forks == SEM_FAILED)
 	{
 		print_error(ERR_MALLOC);
@@ -79,7 +86,7 @@ t_philo	*init_philos(t_philo *philos, t_setup *setup, sem_t *forks)
 			return (NULL);
 		}
 		else if (philos[i].process == 0)
-			living(philo[i]);
+			living(&philos[i]);
 	}
 	return (philos);
 }
@@ -97,12 +104,14 @@ void	end_philos(t_philo *philos)
 		{
 			i = -1;
 			while (++i < philos->setup->num_philos)
-				kill(philos[i].process);
+				kill(philos[i].process, SIGKILL);
 			break ;
 		}
 		i++;
 	}
-	if (sem_close(philos->forks) == -1)
+	if (sem_close(philos->forks) == -1 || sem_close(philos->setup->mealock) == -1
+			|| sem_close(philos->setup->deadlock) == -1 
+			|| sem_close(philos->setup->wrilock) == -1)
 		print_error("Sem_close Error\n");
 	free(philos->setup);
 	free(philos);

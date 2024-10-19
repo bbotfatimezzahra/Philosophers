@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 14:57:38 by fbbot             #+#    #+#             */
-/*   Updated: 2024/09/22 22:37:19 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/10/19 16:28:27 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,18 +14,18 @@
 
 int	print_usage(void)
 {
-	printf("Usage : ./philo_bonus num_of_philos time_to_die time_to_eat");
+	printf("Usage : ./philo num_of_philos time_to_die time_to_eat");
 	printf(" time_to_sleep *num_of_times_aphilo_must_eat\n");
 	printf("*optional\n");
-	printf("All numbers should be non null positive integers\n");
+	printf("[0 - 200] [>60] [>60] [>60] [>=0]\n");
 	return (1);
 }
 
 int	handle_one(t_philo philos)
 {
-	pthread_mutex_lock(&philos.forks[0]);
+	sem_wait(philos.forks);
 	ft_printf("%ld %d has taken a fork\n", philos);
-	pthread_mutex_unlock(&philos.forks[0]);
+	sem_post(philos.forks);
 	printf("%d 1 died\n", philos.setup->time_die);
 	return (0);
 }
@@ -41,17 +41,16 @@ void	monitor(t_philo *philos)
 		{
 			if (!check_meals(philos[i], -1) || !check_death(philos[i], 1))
 			{
-				pthread_mutex_lock(&philos[i].setup->deadlock);
+				sem_wait(philos[i].setup->deadlock);
 				philos[i].setup->death = 1;
-				pthread_mutex_unlock(&philos[i].setup->deadlock);
+				sem_post(philos[i].setup->deadlock);
 				if (!check_death(philos[i], 1))
 				{
-					printf("%ld ", get_timestamp() - philos[i].setup->start);
+					printf("%lld ", get_timestamp() - philos[i].setup->start);
 					printf("%d died\n", philos[i].id);
 				}
-				return ;
 			}
-			usleep(100);
+			usleep(200);
 		}
 	}
 }
@@ -60,8 +59,7 @@ int	main(int argc, char **argv)
 {
 	t_philo			*philos;
 	t_setup			*setup;
-	pthread_mutex_t	*forks;
-	int				i;
+	sem_t	*forks;
 
 	if (argc != 5 && argc != 6)
 		return (print_usage());
@@ -74,17 +72,10 @@ int	main(int argc, char **argv)
 	philos = NULL;
 	philos = init_philos(philos, setup, forks);
 	if (setup->num_philos == 1)
-	{
 		handle_one(philos[0]);
-		pthread_join(philos[0].thread, NULL);
-	}
 	else
-	{
 		monitor(philos);
-		i = -1;
-		while (++i < ft_atoi(argv[1]))
-			pthread_join(philos[i].thread, NULL);
-	}
 	end_philos(philos);
+//	system("leaks philo");
 	return (0);
 }

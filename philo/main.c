@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 14:57:38 by fbbot             #+#    #+#             */
-/*   Updated: 2024/09/24 15:22:34 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/10/19 13:14:17 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ int	handle_one(t_philo philos)
 	ft_printf("%ld %d has taken a fork\n", philos);
 	pthread_mutex_unlock(&philos.forks[0]);
 	printf("%d 1 died\n", philos.setup->time_die);
+	pthread_join(philos.thread, NULL);
 	return (0);
 }
 
@@ -46,9 +47,12 @@ void	monitor(t_philo *philos)
 				pthread_mutex_unlock(&philos[i].setup->deadlock);
 				if (!check_death(philos[i], 1))
 				{
-					printf("%ld ", get_timestamp() - philos[i].setup->start);
+					printf("%lld ", get_timestamp() - philos[i].setup->start);
 					printf("%d died\n", philos[i].id);
 				}
+				i = -1;
+				while (++i < philos[0].setup->num_philos)
+					pthread_join(philos[i].thread, NULL);
 				return ;
 			}
 			usleep(200);
@@ -61,7 +65,6 @@ int	main(int argc, char **argv)
 	t_philo			*philos;
 	t_setup			*setup;
 	pthread_mutex_t	*forks;
-	int				i;
 
 	if (argc != 5 && argc != 6)
 		return (print_usage());
@@ -74,17 +77,10 @@ int	main(int argc, char **argv)
 	philos = NULL;
 	philos = init_philos(philos, setup, forks);
 	if (setup->num_philos == 1)
-	{
 		handle_one(philos[0]);
-		pthread_join(philos[0].thread, NULL);
-	}
 	else
-	{
 		monitor(philos);
-		i = -1;
-		while (++i < ft_atoi(argv[1]))
-			pthread_join(philos[i].thread, NULL);
-	}
 	end_philos(philos);
+//	system("leaks philo");
 	return (0);
 }
