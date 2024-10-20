@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 14:57:38 by fbbot             #+#    #+#             */
-/*   Updated: 2024/10/19 16:28:27 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/10/20 20:24:17 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,36 +30,11 @@ int	handle_one(t_philo philos)
 	return (0);
 }
 
-void	monitor(t_philo *philos)
-{
-	int			i;
-
-	while (1)
-	{
-		i = -1;
-		while (++i < philos[0].setup->num_philos)
-		{
-			if (!check_meals(philos[i], -1) || !check_death(philos[i], 1))
-			{
-				sem_wait(philos[i].setup->deadlock);
-				philos[i].setup->death = 1;
-				sem_post(philos[i].setup->deadlock);
-				if (!check_death(philos[i], 1))
-				{
-					printf("%lld ", get_timestamp() - philos[i].setup->start);
-					printf("%d died\n", philos[i].id);
-				}
-			}
-			usleep(200);
-		}
-	}
-}
-
 int	main(int argc, char **argv)
 {
 	t_philo			*philos;
 	t_setup			*setup;
-	sem_t	*forks;
+	sem_t			*forks;
 
 	if (argc != 5 && argc != 6)
 		return (print_usage());
@@ -73,9 +48,6 @@ int	main(int argc, char **argv)
 	philos = init_philos(philos, setup, forks);
 	if (setup->num_philos == 1)
 		handle_one(philos[0]);
-	else
-		monitor(philos);
 	end_philos(philos);
-//	system("leaks philo");
 	return (0);
 }

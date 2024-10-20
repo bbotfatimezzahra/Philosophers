@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 16:02:37 by fbbot             #+#    #+#             */
-/*   Updated: 2024/10/19 17:07:14 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/10/20 20:15:13 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,32 +14,30 @@
 
 int	check_death(t_philo philo, int flag)
 {
-	int			death;
 	uint64_t	period;
 
-	if (!flag)
+	if (flag)
 	{
 		sem_wait(philo.setup->deadlock);
-		death = philo.setup->death;
 		sem_post(philo.setup->deadlock);
-		if (death)
-			return (0);
+		return (0);
 	}
-	else
+	sem_wait(philo.mealock);
+	period = get_timestamp() - philo.last_meal;
+	sem_post(philo.mealock);
+	if (period > (uint64_t)philo.setup->time_die)
 	{
-		sem_wait(philo.setup->mealock);
-		period = get_timestamp() - philo.last_meal;
-		sem_post(philo.setup->mealock);
-		if (period > (uint64_t)philo.setup->time_die)
-			return (0);
+		sem_wait(philo.setup->deadlock);
+		printf("%lld ", get_timestamp() - philo.setup->start);
+		printf("%d died\n", philo.id);
+		exit(1);
 	}
 	return (1);
 }
 
 void	ft_printf(char *msg, t_philo philo)
 {
-	if (!check_death(philo, 0))
-		return ;
+	check_death(philo, 1);
 	sem_wait(philo.setup->wrilock);
 	printf(msg, get_timestamp() - philo.setup->start, philo.id);
 	sem_post(philo.setup->wrilock);
@@ -57,8 +55,7 @@ void	ft_usleep(int time, t_philo philo)
 {
 	uint64_t	s;
 
-	if (!check_death(philo, 0))
-		return ;
+	check_death(philo, 1);
 	s = get_timestamp();
 	while ((get_timestamp() - s) < (uint64_t)time)
 		usleep(500);

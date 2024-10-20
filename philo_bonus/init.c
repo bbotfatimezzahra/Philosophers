@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 20:50:51 by fbbot             #+#    #+#             */
-/*   Updated: 2024/10/19 17:12:00 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/10/20 20:20:47 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,14 +37,12 @@ t_setup	*init_setup(char **argv)
 	else
 		setup->num_meals = -1;
 	setup->start = get_timestamp();
-	setup->mealock = sem_open("meals", O_CREAT | O_EXCL, 0644, 1);
-	setup->deadlock = sem_open("death", O_CREAT | O_EXCL, 0644, 1);
+	sem_unlink("write");
 	setup->wrilock = sem_open("write", O_CREAT | O_EXCL, 0644, 1);
-	if (setup->mealock == SEM_FAILED || setup->deadlock == SEM_FAILED
-			|| setup->wrilock == SEM_FAILED)
+	sem_unlink("death");
+	setup->deadlock = sem_open("death", O_CREAT | O_EXCL, 0644, 1);
+	if (setup->wrilock == SEM_FAILED || setup->deadlock == SEM_FAILED)
 		return (print_error(ERR_SEM), NULL);
-	setup->death = 0;
-	setup->meals = 0;
 	return (setup);
 }
 
@@ -68,10 +66,7 @@ t_philo	*init_philos(t_philo *philos, t_setup *setup, sem_t *forks)
 
 	philos = malloc(sizeof(t_philo) * setup->num_philos);
 	if (!philos)
-	{
-		print_error(ERR_MALLOC);
-		return (NULL);
-	}
+		return (print_error(ERR_MALLOC), NULL);
 	i = -1;
 	while (++i < setup->num_philos)
 	{
@@ -79,12 +74,14 @@ t_philo	*init_philos(t_philo *philos, t_setup *setup, sem_t *forks)
 		philos[i].setup = setup;
 		philos[i].forks = forks;
 		philos[i].last_meal = philos[i].setup->start;
+		philos[i].meals = 0;
+		sem_unlink("meals");
+		philos[i].mealock = sem_open("meals", O_CREAT | O_EXCL, 0644, 1);
+		if (philos[i].mealock == SEM_FAILED)
+			return (print_error(ERR_SEM), NULL);
 		philos[i].process = fork();
 		if (philos[i].process < 0)
-		{
-			print_error(ERR_FORK);
-			return (NULL);
-		}
+			return (print_error(ERR_FORK), NULL);
 		else if (philos[i].process == 0)
 			living(&philos[i]);
 	}
@@ -109,9 +106,9 @@ void	end_philos(t_philo *philos)
 		}
 		i++;
 	}
-	if (sem_close(philos->forks) == -1 || sem_close(philos->setup->mealock) == -1
-			|| sem_close(philos->setup->deadlock) == -1 
-			|| sem_close(philos->setup->wrilock) == -1)
+	if (sem_close(philos->forks) == -1 || sem_close(philos->mealock) == -1
+		|| sem_close(philos->setup->deadlock) == -1
+		|| sem_close(philos->setup->wrilock) == -1)
 		print_error("Sem_close Error\n");
 	free(philos->setup);
 	free(philos);

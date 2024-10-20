@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 19:01:17 by fbbot             #+#    #+#             */
-/*   Updated: 2024/10/19 16:25:21 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/10/20 20:06:26 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ int	check_args(char **arg)
 		j = 0;
 		while (ft_isdigit(arg[i][j]))
 			j++;
-		if (arg[i][j] || ft_atoi(arg[i]) == -1)
+		if (arg[i][j] || ft_atoi(arg[i]) == -1 || ft_atoi(arg[i]) == 0)
 			return (0);
 		i++;
 	}
@@ -62,25 +62,12 @@ int	check_args(char **arg)
 
 int	check_meals(t_philo philo, int j)
 {
-	int	meals;
-
 	if (philo.setup->num_meals == -1)
 		return (1);
-	if (j == -1)
+	if (j == philo.setup->num_meals)
 	{
-		sem_wait(philo.setup->mealock);
-		meals = philo.setup->meals;
-		sem_post(philo.setup->mealock);
-		if (meals == philo.setup->num_philos)
-			return (0);
-		else
-			return (1);
-	}
-	else if (j == philo.setup->num_meals)
-	{
-		sem_wait(philo.setup->mealock);
-		philo.setup->meals++;
-		sem_post(philo.setup->mealock);
+		usleep(100);
+		exit(0);
 	}
 	return (1);
 }

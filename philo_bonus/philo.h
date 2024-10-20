@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 15:01:39 by fbbot             #+#    #+#             */
-/*   Updated: 2024/10/19 17:11:59 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/10/20 20:23:03 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,21 +40,19 @@ typedef struct s_setup
 	int				time_sleep;
 	int				num_meals;
 	uint64_t		start;
-	int				death;
-	int				meals;;
-	sem_t	*deadlock;
-	sem_t	*wrilock;
-	sem_t	*mealock;
-
+	sem_t			*wrilock;
+	sem_t			*deadlock;
 }		t_setup;
 
 typedef struct s_philo
 {
 	int				id;
-	pid_t		process;
+	pid_t			process;
 	t_setup			*setup;
-	sem_t	*forks;
+	sem_t			*forks;
+	int				meals;
 	uint64_t		last_meal;
+	sem_t			*mealock;
 }		t_philo;
 
 int				ft_atoi(const char *str);
@@ -69,7 +67,7 @@ void			ft_printf(char *msg, t_philo philo);
 int				check_death(t_philo philo, int flag);
 t_setup			*init_setup(char **argv);
 t_philo			*init_philos(t_philo *p, t_setup *s, sem_t *f);
-sem_t	*init_forks(t_setup setup);
+sem_t			*init_forks(t_setup setup);
 int				check_args(char **arg);
 int				check_meals(t_philo philo, int i);
 
