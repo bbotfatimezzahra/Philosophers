@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 16:57:05 by fbbot             #+#    #+#             */
-/*   Updated: 2024/10/20 20:17:08 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/10/21 20:14:53 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ void	eating(t_philo *ph, int i)
 
 void	sleeping_thinking(t_philo philo, int flag)
 {
-	if (flag == 1)
+	if (flag)
 		ft_printf("%ld %d is thinking\n", philo);
 	else
 	{
@@ -73,16 +73,24 @@ void	living(t_philo *philo)
 	int			i;
 
 	if (philo->setup->num_philos == 1)
-		return ;
-	pthread_create(&monitor, NULL, watch, philo);
+		exit(0);
+	if (pthread_create(&monitor, NULL, watch, philo))
+	{
+		print_error(ERR_TH_CREATE);
+		exit(1);
+	}
 	i = 0;
 	while (1)
 	{
 		sleeping_thinking(*philo, 1);
 		eating(philo, i);
-		sleeping_thinking(*philo, 2);
+		sleeping_thinking(*philo, 0);
 		i++;
 		usleep(100);
 	}
-	pthread_join(monitor, NULL);
+	if (pthread_join(monitor, NULL))
+	{
+		print_error(ERR_TH_JOIN);
+		exit(1);
+	}
 }

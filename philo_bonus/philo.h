@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 15:01:39 by fbbot             #+#    #+#             */
-/*   Updated: 2024/10/20 20:23:03 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/10/21 15:56:15 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,11 @@
 # include <fcntl.h>
 
 # define ERR_MALLOC "Allocation failure"
-# define ERR_FORK "Fork failure"
-# define ERR_SEM "Sem failure"
+# define ERR_FORK "Fork Failure"
+# define ERR_SEM_OPEN "Sem Open Failure"
+# define ERR_SEM_CLOSE "Sem Close Failure"
+# define ERR_TH_CREATE "Thread Create Failure"
+# define ERR_TH_JOIN "Thread Join Failure"
 
 typedef struct s_setup
 {
@@ -57,18 +60,19 @@ typedef struct s_philo
 
 int				ft_atoi(const char *str);
 int				ft_isdigit(int c);
-void			start_simulation(t_philo *philos, char **argv);
-void			end_philos(t_philo *philos);
-uint64_t		get_timestamp(void);
-void			living(t_philo *philo);
+int				check_args(char **arg);
+t_setup			*init_setup(char **argv);
+sem_t			*init_forks(t_setup setup);
+t_philo			*init_philos(t_philo *p, t_setup *s, sem_t *f);
 int				print_error(char *err);
+void			living(t_philo *philo);
+uint64_t		get_timestamp(void);
 void			ft_usleep(int time, t_philo philo);
 void			ft_printf(char *msg, t_philo philo);
 int				check_death(t_philo philo, int flag);
-t_setup			*init_setup(char **argv);
-t_philo			*init_philos(t_philo *p, t_setup *s, sem_t *f);
-sem_t			*init_forks(t_setup setup);
-int				check_args(char **arg);
 int				check_meals(t_philo philo, int i);
+void			free_forks(sem_t *forks);
+void			free_setup(t_setup *setup);
+void			end_philos(t_philo *philos);
 
 #endif

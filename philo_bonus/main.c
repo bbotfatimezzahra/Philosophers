@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 14:57:38 by fbbot             #+#    #+#             */
-/*   Updated: 2024/10/20 20:24:17 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/10/21 20:16:36 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,12 @@ int	print_usage(void)
 	printf(" time_to_sleep *num_of_times_aphilo_must_eat\n");
 	printf("*optional\n");
 	printf("[0 - 200] [>60] [>60] [>60] [>=0]\n");
+	return (1);
+}
+
+int	print_error(char *err)
+{
+	printf("%s\n", err);
 	return (1);
 }
 
@@ -40,12 +46,18 @@ int	main(int argc, char **argv)
 		return (print_usage());
 	if (!check_args(argv))
 		return (print_usage());
-	if (ft_atoi(argv[1]) == 0)
+	if (ft_atoi(argv[1]) == 0 || (argc == 6 && ft_atoi(argv[5]) == 0))
 		return (0);
 	setup = init_setup(argv);
+	if (!setup)
+		return (free_setup(setup), 1);
 	forks = init_forks(*setup);
+	if (!forks)
+		return (free_setup(setup), free_forks(forks), 1);
 	philos = NULL;
 	philos = init_philos(philos, setup, forks);
+	if (!philos)
+		return (end_philos(philos), 1);
 	if (setup->num_philos == 1)
 		handle_one(philos[0]);
 	end_philos(philos);

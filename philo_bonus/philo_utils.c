@@ -6,33 +6,35 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 16:02:37 by fbbot             #+#    #+#             */
-/*   Updated: 2024/10/20 20:15:13 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/10/21 16:33:03 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int	check_death(t_philo philo, int flag)
+int	ft_isdigit(int c)
 {
-	uint64_t	period;
-
-	if (flag)
-	{
-		sem_wait(philo.setup->deadlock);
-		sem_post(philo.setup->deadlock);
+	if (c < '0' || c > '9')
 		return (0);
-	}
-	sem_wait(philo.mealock);
-	period = get_timestamp() - philo.last_meal;
-	sem_post(philo.mealock);
-	if (period > (uint64_t)philo.setup->time_die)
-	{
-		sem_wait(philo.setup->deadlock);
-		printf("%lld ", get_timestamp() - philo.setup->start);
-		printf("%d died\n", philo.id);
-		exit(1);
-	}
 	return (1);
+}
+
+int	ft_atoi(const char *str)
+{
+	long long	result;
+	int			i;
+
+	result = 0;
+	i = 0;
+	while (str[i] && ((str[i] >= 9 && str[i] <= 13) || str[i] == 32))
+		i++;
+	while (str[i] && (str[i] >= '0' && str[i] <= '9'))
+	{
+		result = (result * 10) + (str[i++] - '0');
+		if (result > INT_MAX)
+			return (-1);
+	}
+	return (result);
 }
 
 void	ft_printf(char *msg, t_philo philo)
