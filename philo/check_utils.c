@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 19:01:17 by fbbot             #+#    #+#             */
-/*   Updated: 2024/10/21 20:18:52 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/10/21 23:47:45 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,8 +56,9 @@ int	check_death(t_philo philo, int flag)
 		pthread_mutex_lock(&philo.setup->deadlock);
 		philo.setup->death = 1;
 		pthread_mutex_unlock(&philo.setup->deadlock);
-		printf("%lld ", get_timestamp() - philo.setup->start);
-		printf("%d died\n", philo.id);
+		pthread_mutex_lock(&philo.setup->wrilock);
+		printf("%lld %d died\n", get_timestamp() - philo.setup->start, philo.id);
+		pthread_mutex_unlock(&philo.setup->wrilock);
 		return (0);
 	}
 	return (1);
@@ -67,7 +68,7 @@ int	check_meals(t_philo *philo, int j)
 {
 	if (philo->setup->num_meals == -1)
 		return (1);
-	if (j == philo->setup->num_meals)
+	if (j == philo->setup->num_meals )
 	{
 		pthread_mutex_lock(&philo->setup->deadlock);
 		philo->meals = -1;

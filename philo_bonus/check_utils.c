@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 19:01:17 by fbbot             #+#    #+#             */
-/*   Updated: 2024/10/21 16:33:01 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/10/21 23:33:16 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,8 +51,9 @@ int	check_death(t_philo philo, int flag)
 	if (period > (uint64_t)philo.setup->time_die)
 	{
 		sem_wait(philo.setup->deadlock);
-		printf("%lld ", get_timestamp() - philo.setup->start);
-		printf("%d died\n", philo.id);
+		sem_wait(philo.setup->wrilock);
+		printf("%lld %d died\n", get_timestamp() - philo.setup->start, philo.id);
+		sem_post(philo.setup->wrilock);
 		exit(1);
 	}
 	return (1);
