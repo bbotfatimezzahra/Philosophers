@@ -6,34 +6,35 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 16:02:37 by fbbot             #+#    #+#             */
-/*   Updated: 2024/09/22 22:14:47 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/10/21 20:18:34 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int	check_death(t_philo philo, int flag)
+int	ft_isdigit(int c)
 {
-	int			death;
-	uint64_t	period;
+	if ((c >= '0' && c <= '9') || (c >= 9 && c <= 13) || c == 32)
+		return (1);
+	return (0);
+}
 
-	if (!flag)
+int	ft_atoi(const char *str)
+{
+	long long	result;
+	int			i;
+
+	result = 0;
+	i = 0;
+	while (str[i] && ((str[i] >= 9 && str[i] <= 13) || str[i] == 32))
+		i++;
+	while (str[i] && (str[i] >= '0' && str[i] <= '9'))
 	{
-		pthread_mutex_lock(&philo.setup->deadlock);
-		death = philo.setup->death;
-		pthread_mutex_unlock(&philo.setup->deadlock);
-		if (death)
-			return (0);
+		result = (result * 10) + (str[i++] - '0');
+		if (result > INT_MAX)
+			return (-1);
 	}
-	else
-	{
-		pthread_mutex_lock(&philo.setup->mealock);
-		period = get_timestamp() - philo.last_meal;
-		pthread_mutex_unlock(&philo.setup->mealock);
-		if (period > (uint64_t)philo.setup->time_die)
-			return (0);
-	}
-	return (1);
+	return (result);
 }
 
 void	ft_printf(char *msg, t_philo philo)

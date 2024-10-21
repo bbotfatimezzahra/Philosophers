@@ -6,36 +6,11 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 19:01:17 by fbbot             #+#    #+#             */
-/*   Updated: 2024/09/22 22:46:36 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/10/21 20:18:52 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-
-int	ft_isdigit(int c)
-{
-	if ((c >= '0' && c <= '9') || (c >= 9 && c <= 13) || c == 32)
-		return (1);
-	return (0);
-}
-
-int	ft_atoi(const char *str)
-{
-	long long	result;
-	int			i;
-
-	result = 0;
-	i = 0;
-	while (str[i] && ((str[i] >= 9 && str[i] <= 13) || str[i] == 32))
-		i++;
-	while (str[i] && (str[i] >= '0' && str[i] <= '9'))
-	{
-		result = (result * 10) + (str[i++] - '0');
-		if (result > INT_MAX)
-			return (-1);
-	}
-	return (result);
-}
 
 int	check_args(char **arg)
 {
@@ -60,27 +35,44 @@ int	check_args(char **arg)
 	return (1);
 }
 
-int	check_meals(t_philo philo, int j)
+int	check_death(t_philo philo, int flag)
 {
-	int	meals;
+	int			death;
+	uint64_t	period;
 
-	if (philo.setup->num_meals == -1)
-		return (1);
-	if (j == -1)
+	if (!flag)
 	{
-		pthread_mutex_lock(&philo.setup->mealock);
-		meals = philo.setup->meals;
-		pthread_mutex_unlock(&philo.setup->mealock);
-		if (meals == philo.setup->num_philos)
+		pthread_mutex_lock(&philo.setup->deadlock);
+		death = philo.setup->death;
+		pthread_mutex_unlock(&philo.setup->deadlock);
+		if (death || philo.meals == -1)
 			return (0);
-		else
-			return (1);
 	}
-	else if (j == philo.setup->num_meals)
+	pthread_mutex_lock(&philo.mealock);
+	period = get_timestamp() - philo.last_meal;
+	pthread_mutex_unlock(&philo.mealock);
+	if (period > (uint64_t)philo.setup->time_die)
 	{
-		pthread_mutex_lock(&philo.setup->mealock);
-		philo.setup->meals++;
-		pthread_mutex_unlock(&philo.setup->mealock);
+		pthread_mutex_lock(&philo.setup->deadlock);
+		philo.setup->death = 1;
+		pthread_mutex_unlock(&philo.setup->deadlock);
+		printf("%lld ", get_timestamp() - philo.setup->start);
+		printf("%d died\n", philo.id);
+		return (0);
+	}
+	return (1);
+}
+
+int	check_meals(t_philo *philo, int j)
+{
+	if (philo->setup->num_meals == -1)
+		return (1);
+	if (j == philo->setup->num_meals)
+	{
+		pthread_mutex_lock(&philo->setup->deadlock);
+		philo->meals = -1;
+		pthread_mutex_unlock(&philo->setup->deadlock);
+		usleep(100);
 	}
 	return (1);
 }
