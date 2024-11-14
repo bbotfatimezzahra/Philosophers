@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 14:57:38 by fbbot             #+#    #+#             */
-/*   Updated: 2024/10/19 13:14:17 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/11/14 14:53:20 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,28 +31,52 @@ int	handle_one(t_philo philos)
 	return (0);
 }
 
+int	check_philo(t_philo philo, int *j)
+{
+	uint64_t	period;
+
+	pthread_mutex_lock(&philo.setup->mealock);
+	if (philo.setup->num_philos != -1
+			&& philo.setup->meals == philo.setup->num_philos)
+	{
+		pthread_mutex_unlock(&philo.setup->mealock);
+		return (0);
+	}
+	period = get_timestamp() - philo.last_meal;
+	if (period > (uint64_t)philo.setup->time_die)
+	{
+		pthread_mutex_unlock(&philo.setup->mealock);
+		*j = 1;
+		return (0);
+	}
+	pthread_mutex_unlock(&philo.setup->mealock);
+	return (1);
+}	
+
 void	monitor(t_philo *philos)
 {
-	int			i;
+	int	i;
+	int	j;
 
+	usleep(100);
 	while (1)
 	{
 		i = -1;
 		while (++i < philos[0].setup->num_philos)
 		{
-			if (!check_meals(philos[i], -1) || !check_death(philos[i], 1))
+			j = 0;
+			if (!check_philo(philos[i], &j))
 			{
 				pthread_mutex_lock(&philos[i].setup->deadlock);
 				philos[i].setup->death = 1;
 				pthread_mutex_unlock(&philos[i].setup->deadlock);
-				if (!check_death(philos[i], 1))
+				if (j)
 				{
+					pthread_mutex_lock(&philos[i].setup->wrilock);
 					printf("%lld ", get_timestamp() - philos[i].setup->start);
 					printf("%d died\n", philos[i].id);
+					pthread_mutex_unlock(&philos[i].setup->wrilock);
 				}
-				i = -1;
-				while (++i < philos[0].setup->num_philos)
-					pthread_join(philos[i].thread, NULL);
 				return ;
 			}
 			usleep(200);

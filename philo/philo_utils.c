@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 16:02:37 by fbbot             #+#    #+#             */
-/*   Updated: 2024/09/22 22:14:47 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/11/14 13:17:31 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,35 +14,42 @@
 
 int	check_death(t_philo philo, int flag)
 {
-	int			death;
 	uint64_t	period;
 
 	if (!flag)
 	{
 		pthread_mutex_lock(&philo.setup->deadlock);
-		death = philo.setup->death;
-		pthread_mutex_unlock(&philo.setup->deadlock);
-		if (death)
+		if (philo.setup->death)
+		{
+			pthread_mutex_unlock(&philo.setup->deadlock);
 			return (0);
+		}
+		pthread_mutex_unlock(&philo.setup->deadlock);
 	}
 	else
 	{
 		pthread_mutex_lock(&philo.setup->mealock);
 		period = get_timestamp() - philo.last_meal;
-		pthread_mutex_unlock(&philo.setup->mealock);
 		if (period > (uint64_t)philo.setup->time_die)
+		{
+			pthread_mutex_unlock(&philo.setup->mealock);
 			return (0);
+		}
+		pthread_mutex_unlock(&philo.setup->mealock);
 	}
 	return (1);
 }
 
 void	ft_printf(char *msg, t_philo philo)
 {
-	if (!check_death(philo, 0))
-		return ;
-	pthread_mutex_lock(&philo.setup->wrilock);
-	printf(msg, get_timestamp() - philo.setup->start, philo.id);
-	pthread_mutex_unlock(&philo.setup->wrilock);
+	pthread_mutex_lock(&philo.setup->deadlock);
+	if (!philo.setup->death)
+	{
+		pthread_mutex_lock(&philo.setup->wrilock);
+		printf(msg, get_timestamp() - philo.setup->start, philo.id);
+		pthread_mutex_unlock(&philo.setup->wrilock);
+	}
+	pthread_mutex_unlock(&philo.setup->deadlock);
 }
 
 uint64_t	get_timestamp(void)

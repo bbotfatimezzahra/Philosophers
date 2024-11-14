@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 16:57:05 by fbbot             #+#    #+#             */
-/*   Updated: 2024/10/19 12:14:12 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/11/14 15:25:08 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ void	eating(t_philo *ph, int i)
 	ft_usleep(philo.setup->time_eat, philo);
 	pthread_mutex_unlock(&(philo.forks[philo.id - 1]));
 	pthread_mutex_unlock(&(philo.forks[fork2 - 1]));
+	check_meals(philo, i);
 }
 
 void	sleeping(t_philo philo)
@@ -72,7 +73,7 @@ void	*living(void *ph)
 	if (philo->setup->num_philos == 1)
 		return (NULL);
 	i = 0;
-	while (check_meals(*philo, i) && check_death(*philo, 0))
+	while (check_death(*philo, 0))
 	{
 		thinking(*philo);
 		eating(philo, i);

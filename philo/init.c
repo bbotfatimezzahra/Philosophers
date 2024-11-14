@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 20:50:51 by fbbot             #+#    #+#             */
-/*   Updated: 2024/09/22 22:25:13 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/11/14 10:48:41 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,9 @@ void	end_philos(t_philo *philos)
 {
 	int	i;
 
+	i = -1;
+	while (++i < philos[0].setup->num_philos)
+		pthread_join(philos[i].thread, NULL);
 	i = 0;
 	while (i < philos->setup->num_philos)
 	{
