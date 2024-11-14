@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 14:57:38 by fbbot             #+#    #+#             */
-/*   Updated: 2024/10/21 20:18:46 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/10/19 13:14:17 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,19 +21,43 @@ int	print_usage(void)
 	return (1);
 }
 
-int	print_error(char *err)
-{
-	printf("%s\n", err);
-	return (1);
-}
-
 int	handle_one(t_philo philos)
 {
 	pthread_mutex_lock(&philos.forks[0]);
 	ft_printf("%ld %d has taken a fork\n", philos);
 	pthread_mutex_unlock(&philos.forks[0]);
 	printf("%d 1 died\n", philos.setup->time_die);
+	pthread_join(philos.thread, NULL);
 	return (0);
+}
+
+void	monitor(t_philo *philos)
+{
+	int			i;
+
+	while (1)
+	{
+		i = -1;
+		while (++i < philos[0].setup->num_philos)
+		{
+			if (!check_meals(philos[i], -1) || !check_death(philos[i], 1))
+			{
+				pthread_mutex_lock(&philos[i].setup->deadlock);
+				philos[i].setup->death = 1;
+				pthread_mutex_unlock(&philos[i].setup->deadlock);
+				if (!check_death(philos[i], 1))
+				{
+					printf("%lld ", get_timestamp() - philos[i].setup->start);
+					printf("%d died\n", philos[i].id);
+				}
+				i = -1;
+				while (++i < philos[0].setup->num_philos)
+					pthread_join(philos[i].thread, NULL);
+				return ;
+			}
+			usleep(200);
+		}
+	}
 }
 
 int	main(int argc, char **argv)
@@ -46,20 +70,17 @@ int	main(int argc, char **argv)
 		return (print_usage());
 	if (!check_args(argv))
 		return (print_usage());
-	if (ft_atoi(argv[1]) == 0 || (argc == 6 && ft_atoi(argv[5]) == 0))
+	if (ft_atoi(argv[1]) == 0)
 		return (0);
 	setup = init_setup(argv);
-	if (!setup)
-		return (free_setup(setup), 1);
 	forks = init_forks(*setup);
-	if (!forks)
-		return (free_setup(setup), free_forks(forks, ft_atoi(argv[1])), 1);
 	philos = NULL;
 	philos = init_philos(philos, setup, forks);
-	if (!philos)
-		return (end_philos(philos), 1);
 	if (setup->num_philos == 1)
 		handle_one(philos[0]);
+	else
+		monitor(philos);
 	end_philos(philos);
+//	system("leaks philo");
 	return (0);
 }
