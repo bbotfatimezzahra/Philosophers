@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 19:01:17 by fbbot             #+#    #+#             */
-/*   Updated: 2024/10/22 09:13:07 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/10/21 23:47:45 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ int	check_death(t_philo philo, int flag)
 		philo.setup->death = 1;
 		pthread_mutex_unlock(&philo.setup->deadlock);
 		pthread_mutex_lock(&philo.setup->wrilock);
-		printf("%ld %d died\n", get_timestamp() - philo.setup->start, philo.id);
+		printf("%lld %d died\n", get_timestamp() - philo.setup->start, philo.id);
 		pthread_mutex_unlock(&philo.setup->wrilock);
 		return (0);
 	}
