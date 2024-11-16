@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 20:50:51 by fbbot             #+#    #+#             */
-/*   Updated: 2024/11/14 10:48:41 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/11/14 18:03:58 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,9 @@ void	end_philos(t_philo *philos)
 	i = -1;
 	while (++i < philos[0].setup->num_philos)
 		pthread_join(philos[i].thread, NULL);
+	pthread_mutex_destroy(&philos->setup->mealock);
+	pthread_mutex_destroy(&philos->setup->wrilock);
+	pthread_mutex_destroy(&philos->setup->deadlock);
 	i = 0;
 	while (i < philos->setup->num_philos)
 	{
@@ -103,9 +106,6 @@ void	end_philos(t_philo *philos)
 		i++;
 	}
 	free(philos->forks);
-	pthread_mutex_destroy(&philos->setup->mealock);
-	pthread_mutex_destroy(&philos->setup->wrilock);
-	pthread_mutex_destroy(&philos->setup->deadlock);
 	free(philos->setup);
 	free(philos);
 }

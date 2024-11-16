@@ -6,25 +6,27 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 16:57:05 by fbbot             #+#    #+#             */
-/*   Updated: 2024/11/14 15:25:08 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/11/16 16:16:21 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	grab_forks(t_philo philo, int fork1, int fork2)
+int	grab_forks(t_philo philo, int fork1, int fork2)
 {
 	if (!check_death(philo, 0))
-		return ;
+		return (0);
 	pthread_mutex_lock(&(philo.forks[fork1 - 1]));
 	ft_printf("%ld %d has taken a fork\n", philo);
 	pthread_mutex_lock(&(philo.forks[fork2 - 1]));
 	ft_printf("%ld %d has taken a fork\n", philo);
+	return (1);
 }
 
 void	eating(t_philo *ph, int i)
 {
 	int		fork2;
+	int		j;
 	t_philo	philo;
 
 	philo = *ph;
@@ -32,16 +34,15 @@ void	eating(t_philo *ph, int i)
 		return ;
 	fork2 = (philo.id % philo.setup->num_philos) + 1;
 	if (philo.id % 2 == 0)
-	{
-		ft_usleep(1, philo);
-		grab_forks(philo, philo.id, fork2);
-	}
+		j = grab_forks(philo, philo.id, fork2);
 	else
 	{
 		if (philo.setup->num_philos % 2 == 1 && philo.id == 1 && !i)
-			ft_usleep(philo.setup->time_eat, philo);
-		grab_forks(philo, fork2, philo.id);
+			ft_usleep(60, philo);
+		j = grab_forks(philo, fork2, philo.id);
 	}
+	if (!j)
+		return;
 	ft_printf("%ld %d is eating\n", philo);
 	pthread_mutex_lock(&philo.setup->mealock);
 	ph->last_meal = get_timestamp();
@@ -49,7 +50,7 @@ void	eating(t_philo *ph, int i)
 	ft_usleep(philo.setup->time_eat, philo);
 	pthread_mutex_unlock(&(philo.forks[philo.id - 1]));
 	pthread_mutex_unlock(&(philo.forks[fork2 - 1]));
-	check_meals(philo, i);
+	check_meals(philo, i + 1);
 }
 
 void	sleeping(t_philo philo)
@@ -73,6 +74,8 @@ void	*living(void *ph)
 	if (philo->setup->num_philos == 1)
 		return (NULL);
 	i = 0;
+	if (philo->id % 2 == 0)
+		ft_usleep(5, *philo);
 	while (check_death(*philo, 0))
 	{
 		thinking(*philo);

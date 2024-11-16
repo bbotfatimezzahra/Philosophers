@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 15:01:39 by fbbot             #+#    #+#             */
-/*   Updated: 2024/09/22 22:13:55 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/11/14 16:16:07 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,11 @@
 # include <string.h>
 
 # define ERR_MALLOC "Allocation failure"
+# define ERR_MUTEX_INIT "Mutex init failure"
+# define ERR_MUTEX_LOCK "Mutex lock failure"
+# define ERR_MUTEX_DESTROY "Mutex destroy failure"
+# define ERR_THREAD_CREATE "Thread create failure"
+# define ERR_THREAD_JOIN "Thread join failure"
 
 typedef struct s_setup
 {
