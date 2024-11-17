@@ -56,5 +56,5 @@ void	ft_usleep(int time, t_philo philo)
 		return ;
 	s = get_timestamp();
 	while ((get_timestamp() - s) < (uint64_t)time)
-		usleep(500);
+		usleep(50);
 }

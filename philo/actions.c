@@ -62,7 +62,7 @@ void	sleeping(t_philo philo)
 void	thinking(t_philo philo)
 {
 	ft_printf("%ld %d is thinking\n", philo);
-	ft_usleep(1, philo);
+	// ft_usleep(1, philo);
 }
 
 void	*living(void *ph)
@@ -74,15 +74,15 @@ void	*living(void *ph)
 	if (philo->setup->num_philos == 1)
 		return (NULL);
 	i = 0;
-	if (philo->id % 2 == 0)
-		ft_usleep(5, *philo);
+	if (philo->id % 2 == 0 && philo->setup->num_philos % 2 == 0)
+		ft_usleep(20, *philo);
 	while (check_death(*philo, 0))
 	{
 		thinking(*philo);
 		eating(philo, i);
 		sleeping(*philo);
 		i++;
-		usleep(100);
+		ft_usleep(60, *philo);
 	}
 	return (NULL);
 }

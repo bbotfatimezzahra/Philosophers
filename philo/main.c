@@ -76,7 +76,7 @@ void	monitor(t_philo *philos)
 				}
 				return ;
 			}
-			usleep(100);
+			// usleep(10);
 		}
 	}
 }
