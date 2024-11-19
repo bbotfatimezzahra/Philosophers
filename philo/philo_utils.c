@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 16:02:37 by fbbot             #+#    #+#             */
-/*   Updated: 2024/11/19 12:55:46 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/11/19 23:26:47 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,6 @@ void	ft_usleep(int time, t_philo philo)
 	if (!check_death(philo, 0))
 		return ;
 	s = get_timestamp();
-	while ((get_timestamp() - s) < (uint64_t)time)
+	while (check_death(philo, 0) && ((get_timestamp() - s) < (uint64_t)time))
 		usleep(50);
 }

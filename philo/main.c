@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 14:57:38 by fbbot             #+#    #+#             */
-/*   Updated: 2024/11/19 12:59:48 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/11/19 23:28:10 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,9 +26,10 @@ int	handle_one(t_philo philos)
 	if (pthread_mutex_lock(&philos.forks[0]))
 		return (print_error(ERR_MUTEX_LOCK));
 	ft_printf("%ld %d has taken a fork\n", philos);
+	ft_usleep(philos.setup->time_die, philos);
+	printf("%d 1 died\n", philos.setup->time_die);
 	if (pthread_mutex_unlock(&philos.forks[0]))
 		return (print_error(ERR_MUTEX_LOCK));
-	printf("%d 1 died\n", philos.setup->time_die);
 	pthread_join(philos.thread, NULL);
 	return (0);
 }
