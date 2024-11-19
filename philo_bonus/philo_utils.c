@@ -39,10 +39,11 @@ int	ft_atoi(const char *str)
 
 void	ft_printf(char *msg, t_philo philo)
 {
-	check_death(philo, 1);
+	sem_wait(philo.setup->deadlock);
 	sem_wait(philo.setup->wrilock);
 	printf(msg, get_timestamp() - philo.setup->start, philo.id);
 	sem_post(philo.setup->wrilock);
+	sem_post(philo.setup->deadlock);
 }
 
 uint64_t	get_timestamp(void)
@@ -60,5 +61,5 @@ void	ft_usleep(int time, t_philo philo)
 	check_death(philo, 1);
 	s = get_timestamp();
 	while ((get_timestamp() - s) < (uint64_t)time)
-		usleep(500);
+		usleep(50);
 }

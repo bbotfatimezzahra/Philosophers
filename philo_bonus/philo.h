@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 15:01:39 by fbbot             #+#    #+#             */
-/*   Updated: 2024/10/21 15:56:15 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/11/19 15:24:14 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ int				check_args(char **arg);
 t_setup			*init_setup(char **argv);
 sem_t			*init_forks(t_setup setup);
 t_philo			*init_philos(t_philo *p, t_setup *s, sem_t *f);
-int				print_error(char *err);
+void			print_error(char *err);
 void			living(t_philo *philo);
 uint64_t		get_timestamp(void);
 void			ft_usleep(int time, t_philo philo);

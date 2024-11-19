@@ -6,25 +6,35 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 16:02:37 by fbbot             #+#    #+#             */
-/*   Updated: 2024/11/16 22:43:34 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/11/19 12:55:46 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int	check_death(t_philo philo, int flag)
+int	ft_isdigit(int c)
 {
-	if (!flag)
+	if ((c >= '0' && c <= '9') || (c >= 9 && c <= 13) || c == 32)
+		return (1);
+	return (0);
+}
+
+int	ft_atoi(const char *str)
+{
+	long long	result;
+	int			i;
+
+	result = 0;
+	i = 0;
+	while (str[i] && ((str[i] >= 9 && str[i] <= 13) || str[i] == 32))
+		i++;
+	while (str[i] && (str[i] >= '0' && str[i] <= '9'))
 	{
-		pthread_mutex_lock(&philo.setup->deadlock);
-		if (philo.setup->death)
-		{
-			pthread_mutex_unlock(&philo.setup->deadlock);
-			return (0);
-		}
-		pthread_mutex_unlock(&philo.setup->deadlock);
+		result = (result * 10) + (str[i++] - '0');
+		if (result > INT_MAX)
+			return (-1);
 	}
-	return (1);
+	return (result);
 }
 
 void	ft_printf(char *msg, t_philo philo)
@@ -52,6 +62,7 @@ uint64_t	get_timestamp(void)
 void	ft_usleep(int time, t_philo philo)
 {
 	uint64_t	s;
+
 	if (!check_death(philo, 0))
 		return ;
 	s = get_timestamp();

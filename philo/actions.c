@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 16:57:05 by fbbot             #+#    #+#             */
-/*   Updated: 2024/11/16 16:16:21 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/11/19 12:49:07 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,11 +38,11 @@ void	eating(t_philo *ph, int i)
 	else
 	{
 		if (philo.setup->num_philos % 2 == 1 && philo.id == 1 && !i)
-			ft_usleep(60, philo);
+			ft_usleep(philo.setup->time_eat, philo);
 		j = grab_forks(philo, fork2, philo.id);
 	}
 	if (!j)
-		return;
+		return ;
 	ft_printf("%ld %d is eating\n", philo);
 	pthread_mutex_lock(&philo.setup->mealock);
 	ph->last_meal = get_timestamp();
@@ -50,7 +50,6 @@ void	eating(t_philo *ph, int i)
 	ft_usleep(philo.setup->time_eat, philo);
 	pthread_mutex_unlock(&(philo.forks[philo.id - 1]));
 	pthread_mutex_unlock(&(philo.forks[fork2 - 1]));
-	check_meals(philo, i + 1);
 }
 
 void	sleeping(t_philo philo)
@@ -62,7 +61,6 @@ void	sleeping(t_philo philo)
 void	thinking(t_philo philo)
 {
 	ft_printf("%ld %d is thinking\n", philo);
-	// ft_usleep(1, philo);
 }
 
 void	*living(void *ph)
@@ -74,15 +72,18 @@ void	*living(void *ph)
 	if (philo->setup->num_philos == 1)
 		return (NULL);
 	i = 0;
-	if (philo->id % 2 == 0 && philo->setup->num_philos % 2 == 0)
-		ft_usleep(20, *philo);
+	if (philo->id % 2 == 0)
+		usleep(10);
 	while (check_death(*philo, 0))
 	{
 		thinking(*philo);
 		eating(philo, i);
+		check_meals(*philo, i + 1);
 		sleeping(*philo);
 		i++;
-		ft_usleep(60, *philo);
+		if (philo->setup->num_philos % 2 == 1
+			&& philo->setup->time_eat >= philo->setup->time_sleep)
+			ft_usleep(philo->setup->time_eat, *philo);
 	}
 	return (NULL);
 }

@@ -6,36 +6,11 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 19:01:17 by fbbot             #+#    #+#             */
-/*   Updated: 2024/11/16 22:25:33 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/11/19 12:56:01 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-
-int	ft_isdigit(int c)
-{
-	if ((c >= '0' && c <= '9') || (c >= 9 && c <= 13) || c == 32)
-		return (1);
-	return (0);
-}
-
-int	ft_atoi(const char *str)
-{
-	long long	result;
-	int			i;
-
-	result = 0;
-	i = 0;
-	while (str[i] && ((str[i] >= 9 && str[i] <= 13) || str[i] == 32))
-		i++;
-	while (str[i] && (str[i] >= '0' && str[i] <= '9'))
-	{
-		result = (result * 10) + (str[i++] - '0');
-		if (result > INT_MAX)
-			return (-1);
-	}
-	return (result);
-}
 
 int	check_args(char **arg)
 {
@@ -48,7 +23,7 @@ int	check_args(char **arg)
 		j = 0;
 		while (ft_isdigit(arg[i][j]))
 			j++;
-		if (arg[i][j] || ft_atoi(arg[i]) == -1)
+		if (arg[i][j] || ft_atoi(arg[i]) == -1 || ft_atoi(arg[i]) == 0)
 			return (0);
 		i++;
 	}
@@ -57,6 +32,21 @@ int	check_args(char **arg)
 	if (ft_atoi(arg[2]) < 60 || ft_atoi(arg[3]) < 60
 		|| ft_atoi(arg[4]) < 60)
 		return (0);
+	return (1);
+}
+
+int	check_death(t_philo philo, int flag)
+{
+	if (!flag)
+	{
+		pthread_mutex_lock(&philo.setup->deadlock);
+		if (philo.setup->death)
+		{
+			pthread_mutex_unlock(&philo.setup->deadlock);
+			return (0);
+		}
+		pthread_mutex_unlock(&philo.setup->deadlock);
+	}
 	return (1);
 }
 
@@ -70,5 +60,24 @@ int	check_meals(t_philo philo, int j)
 		philo.setup->meals++;
 		pthread_mutex_unlock(&philo.setup->mealock);
 	}
+	return (1);
+}
+
+int	check_philo(t_philo philo, int *j)
+{
+	pthread_mutex_lock(&philo.setup->mealock);
+	if (philo.setup->num_philos != -1
+		&& philo.setup->meals == philo.setup->num_philos)
+	{
+		pthread_mutex_unlock(&philo.setup->mealock);
+		return (0);
+	}
+	if (get_timestamp() - philo.last_meal > (uint64_t)philo.setup->time_die)
+	{
+		pthread_mutex_unlock(&philo.setup->mealock);
+		*j = 1;
+		return (0);
+	}
+	pthread_mutex_unlock(&philo.setup->mealock);
 	return (1);
 }

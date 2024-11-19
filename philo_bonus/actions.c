@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 16:57:05 by fbbot             #+#    #+#             */
-/*   Updated: 2024/10/21 20:14:53 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/11/19 15:23:52 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,9 +27,7 @@ void	eating(t_philo *ph, int i)
 
 	philo = *ph;
 	check_death(philo, 1);
-	if (philo.id % 2 == 0)
-		ft_usleep(1, philo);
-	else if (philo.setup->num_philos % 2 == 1 && philo.id == 1 && !i)
+	if (philo.setup->num_philos % 2 == 1 && philo.id == 1 && !i)
 		ft_usleep(philo.setup->time_eat, philo);
 	grab_forks(philo);
 	ft_printf("%ld %d is eating\n", philo);
@@ -60,10 +58,7 @@ void	*watch(void *ph)
 
 	philo = (t_philo *)ph;
 	while (1)
-	{
 		check_death(*philo, 0);
-		usleep(500);
-	}
 	return (NULL);
 }
 
@@ -75,22 +70,20 @@ void	living(t_philo *philo)
 	if (philo->setup->num_philos == 1)
 		exit(0);
 	if (pthread_create(&monitor, NULL, watch, philo))
-	{
 		print_error(ERR_TH_CREATE);
-		exit(1);
-	}
 	i = 0;
+	if (philo->id % 2 == 0)
+		ft_usleep(1, *philo);
 	while (1)
 	{
 		sleeping_thinking(*philo, 1);
 		eating(philo, i);
 		sleeping_thinking(*philo, 0);
+		if (philo->setup->num_philos % 2 == 1
+			&& philo->setup->time_eat >= philo->setup->time_sleep)
+			ft_usleep(philo->setup->time_eat, *philo);
 		i++;
-		usleep(100);
 	}
 	if (pthread_join(monitor, NULL))
-	{
 		print_error(ERR_TH_JOIN);
-		exit(1);
-	}
 }

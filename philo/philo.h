@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 15:01:39 by fbbot             #+#    #+#             */
-/*   Updated: 2024/11/14 16:16:07 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/11/19 12:54:19 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,5 +68,6 @@ t_philo			*init_philos(t_philo *p, t_setup *s, pthread_mutex_t *f);
 pthread_mutex_t	*init_forks(t_setup setup);
 int				check_args(char **arg);
 int				check_meals(t_philo philo, int i);
+int				check_philo(t_philo philo, int *j);
 
 #endif

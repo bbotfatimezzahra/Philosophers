@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 14:57:38 by fbbot             #+#    #+#             */
-/*   Updated: 2024/11/16 22:37:24 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/11/19 12:59:48 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,27 +29,27 @@ int	handle_one(t_philo philos)
 	if (pthread_mutex_unlock(&philos.forks[0]))
 		return (print_error(ERR_MUTEX_LOCK));
 	printf("%d 1 died\n", philos.setup->time_die);
+	pthread_join(philos.thread, NULL);
 	return (0);
 }
 
-int	check_philo(t_philo philo, int *j)
+void	kill_philos(t_philo *philos, int i, int j)
 {
-	pthread_mutex_lock(&philo.setup->mealock);
-	if (philo.setup->num_philos != -1
-			&& philo.setup->meals == philo.setup->num_philos)
+	pthread_mutex_lock(&philos[i].setup->deadlock);
+	philos->setup->death = 1;
+	pthread_mutex_unlock(&philos[i].setup->deadlock);
+	if (j)
 	{
-		pthread_mutex_unlock(&philo.setup->mealock);
-		return (0);
+		pthread_mutex_lock(&philos[i].setup->wrilock);
+		printf("%ld ", get_timestamp() - philos[i].setup->start);
+		printf("%d died\n", philos[i].id);
+		pthread_mutex_unlock(&philos[i].setup->wrilock);
 	}
-	if (get_timestamp() - philo.last_meal > (uint64_t)philo.setup->time_die)
-	{
-		pthread_mutex_unlock(&philo.setup->mealock);
-		*j = 1;
-		return (0);
-	}
-	pthread_mutex_unlock(&philo.setup->mealock);
-	return (1);
-}	
+	i = -1;
+	while (++i < philos[0].setup->num_philos)
+		pthread_join(philos[i].thread, NULL);
+	return ;
+}
 
 void	monitor(t_philo *philos)
 {
@@ -64,19 +64,10 @@ void	monitor(t_philo *philos)
 			j = 0;
 			if (!check_philo(philos[i], &j))
 			{
-				pthread_mutex_lock(&philos[i].setup->deadlock);
-				philos->setup->death = 1;
-				pthread_mutex_unlock(&philos[i].setup->deadlock);
-				if (j)
-				{
-					pthread_mutex_lock(&philos[i].setup->wrilock);
-					printf("%ld ", get_timestamp() - philos[i].setup->start);
-					printf("%d died\n", philos[i].id);
-					pthread_mutex_unlock(&philos[i].setup->wrilock);
-				}
+				kill_philos(philos, i, j);
 				return ;
 			}
-			// usleep(10);
+			usleep(10);
 		}
 	}
 }
@@ -91,8 +82,6 @@ int	main(int argc, char **argv)
 		return (print_usage());
 	if (!check_args(argv))
 		return (print_usage());
-	if (ft_atoi(argv[1]) == 0)
-		return (0);
 	setup = init_setup(argv);
 	forks = init_forks(*setup);
 	philos = NULL;
@@ -102,6 +91,5 @@ int	main(int argc, char **argv)
 	else
 		monitor(philos);
 	end_philos(philos);
-//	system("leaks philo");
 	return (0);
 }

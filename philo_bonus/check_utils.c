@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 19:01:17 by fbbot             #+#    #+#             */
-/*   Updated: 2024/11/16 20:30:50 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/11/19 15:21:49 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ int	check_args(char **arg)
 		j = 0;
 		while (ft_isdigit(arg[i][j]))
 			j++;
-		if (arg[i][j] || ft_atoi(arg[i]) == -1)
+		if (arg[i][j] || ft_atoi(arg[i]) == -1 || ft_atoi(arg[i]) == 0)
 			return (0);
 		i++;
 	}
@@ -47,14 +47,15 @@ int	check_death(t_philo philo, int flag)
 	}
 	sem_wait(philo.mealock);
 	period = get_timestamp() - philo.last_meal;
-	sem_post(philo.mealock);
 	if (period > (uint64_t)philo.setup->time_die)
 	{
+		sem_post(philo.mealock);
 		sem_wait(philo.setup->deadlock);
 		printf("%ld ", get_timestamp() - philo.setup->start);
 		printf("%d died\n", philo.id);
 		exit(1);
 	}
+	sem_post(philo.mealock);
 	return (1);
 }
 
@@ -63,9 +64,6 @@ int	check_meals(t_philo philo, int j)
 	if (philo.setup->num_meals == -1)
 		return (1);
 	if (j == philo.setup->num_meals)
-	{
-		usleep(100);
 		exit(0);
-	}
 	return (1);
 }

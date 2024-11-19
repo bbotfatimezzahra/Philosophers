@@ -6,7 +6,7 @@
 /*   By: fbbot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 14:57:38 by fbbot             #+#    #+#             */
-/*   Updated: 2024/10/21 20:16:36 by fbbot            ###   ########.fr       */
+/*   Updated: 2024/11/19 15:23:32 by fbbot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,10 @@ int	print_usage(void)
 	return (1);
 }
 
-int	print_error(char *err)
+void	print_error(char *err)
 {
 	printf("%s\n", err);
-	return (1);
+	exit (1);
 }
 
 int	handle_one(t_philo philos)
