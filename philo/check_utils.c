@@ -66,7 +66,7 @@ int	check_meals(t_philo philo, int j)
 int	check_philo(t_philo philo, int *j)
 {
 	pthread_mutex_lock(&philo.setup->mealock);
-	if (philo.setup->num_philos != -1
+	if (philo.setup->num_meals != -1
 		&& philo.setup->meals == philo.setup->num_philos)
 	{
 		pthread_mutex_unlock(&philo.setup->mealock);
